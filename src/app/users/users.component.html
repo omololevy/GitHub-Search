@@ -9,6 +9,12 @@
                         <input type="search" class="form-control" placeholder="Enter username to search" id="searching" #search>
                     </div>
                     <button type="button" class="btn btn-primary" (click)="doSearch(search.value)">Search</button>
+
+                    <div class="form-group">
+                        <p style="font-weight: bold;">Search By Repository name: </p>
+                        <input type="search" class="form-control" placeholder="Enter repository to search" id="searching" #search>
+                    </div>
+                    <button type="button" class="btn btn-primary" (click)="doSearch(search.value)">Search</button>
                 </form>
             </div>
 
@@ -41,8 +47,7 @@
         <div class="card bg-light mb-3" id="myc" style="max-width: 18rem;" *ngFor='let repo of myRepos.newRepository'>
             <div class="card-header" style="font-weight: bold;">Repo Name: {{ repo.name | titlecase }} </div>
             <div class="card-body">
-                <a type="button" class="btn btn-success btn-sm" href="{{repo.html_url}}" target="_blank" id="btl">Github Link
-        </a>
+                <a type="button" class="btn btn-success btn-sm" href="{{repo.html_url}}" target="_blank" id="btl">Open in Github</a>
                 <p class="card-text" id="bb"> Description:</p> {{ repo.description }}
                 <div id="dada">
                     Date Created:
