@@ -1,11 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=STIX+Two+Math&display=swap');
 .container {
-    background-color: khaki;
+    background-color: rgb(20, 4, 19);
     font-family: 'STIX Two Math', serif;
 }
 
 button {
     margin-top: 10px;
+}
+
+#search {
+    color: rgb(21, 9, 245);
+    text-shadow: red;
+    font-weight: bolder;
+    font-size: larger;
 }
 
 #searching {
@@ -18,19 +25,25 @@ button {
     width: 105px;
 }
 
-#prof {
+#prof,
+#prof1 {
     margin: 5px;
-    box-shadow: 10px 10px 5px -1px rgba(0, 128, 0, 0.66);
-    -webkit-box-shadow: 10px 10px 5px -1px rgba(0, 128, 0, 0.66);
-    -moz-box-shadow: 10px 10px 5px -1px rgba(0, 128, 0, 0.66);
+    box-shadow: 10px 10px 5px -1px rgba(221, 11, 211, 0.66);
+    -webkit-box-shadow: 10px 10px 5px -1px rgba(250, 11, 250, 0.66);
+    -moz-box-shadow: 10px 10px 5px -1px rgba(5, 107, 121, 0.66);
+}
+
+#prof1 {
+    margin-left: 20px;
 }
 
 #sch {
+    background-image: url("../../assets/github.jpeg");
     margin: 5px;
     height: 195px;
     padding: 10px;
-    box-shadow: 10px 10px 5px -1px rgba(0, 45, 128, 0.66);
-    -webkit-box-shadow: 10px 10px 5px -1px rgba(0, 128, 0, 0.66);
+    box-shadow: 10px 10px 5px -1px rgba(34, 207, 11, 0.66);
+    -webkit-box-shadow: 10px 10px 5px -1px rgba(3, 0, 194, 0.66);
     -moz-box-shadow: 10px 10px 5px -1px rgba(0, 128, 0, 0.66);
 }
 
@@ -41,7 +54,7 @@ button {
 
 #des,
 #dat {
-    color: green;
+    color: rgb(236, 19, 207);
     font-weight: bold;
     font-style: italic;
 }
