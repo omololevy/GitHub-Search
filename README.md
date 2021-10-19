@@ -1,5 +1,7 @@
 # GITHUB-SEARCH
-#### This is a project on developing an application where users can create quotes and have those quotes voted on whether they are terrible or are inspirational..
+#### This is a project on developing a website where users may enter a GitHub username into a form, submit it, and see names and descriptions of that person's public repositories. A person can also look for repositories.
+
+
  
  ***Tuesday October 19 2021*** 
 #### By **OMOLO LEVY**&trade;
@@ -51,5 +53,5 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 ## Support and contact details
 contact me @omololevy@gmail.com
 ### License
-The project is under [MIT license](https://github.com/omololevy/Quote-Vote/commit/388e1788c5d156476a55a8c4e4421a8fb68c885d) 
+The project is under [MIT license](https://github.com/omololevy/GitHub-Search/blob/master/LICENSE) 
 Copyright &copy; 2021.All rigths reserved
