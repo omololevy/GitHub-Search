@@ -9,11 +9,13 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgProgressHttpClientModule } from '@ngx-progressbar/http-client';
 import { NavbarComponent } from './navbar/navbar.component';
 
+
 @NgModule({
   declarations: [
     AppComponent,
     UsersComponent,
     NavbarComponent,
+  
   ],
   imports: [
     BrowserModule,
