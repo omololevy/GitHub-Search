@@ -5,7 +5,7 @@
             <div class="card bg-light mb-3" id="sch">
                 <form class="form-inline">
                     <div class="form-group">
-                        <p style="font-weight: bold;">Search By Username: </p>
+                        <p id="search" style="font-weight: bold;">Search By Username: </p>
                         <input type="search" class="form-control" placeholder="Enter username to search" id="searching" #search>
                     </div>
                     <button type="button" class="btn btn-primary" (click)="doSearch(search.value)">Search</button>
@@ -13,7 +13,7 @@
             </div>
 
         </div>
-        <div class="col-md-8">
+        <div class="col-md-6">
             <div class="card bg-light mb-3" id="prof">
                 <div class="row no-gutters">
                     <div class="col-md-3">
@@ -35,20 +35,21 @@
     </div>
     <div class="row">
 
-    </div>
 
-    <div class="row">
-        <div class="card bg-light mb-3" id="prof" style="max-width: 18rem;" *ngFor='let repo of myRepos.newRepository'>
-            <div class="card-header" style="font-weight: bold;">Repo Name: {{ repo.name | titlecase }} </div>
-            <div class="card-body">
-                <a type="button" class="btn btn-success btn-sm" href="{{repo.html_url}}" target="_blank" id="btl">Open in Github</a>
-                <p class="card-text" id="des"> Description:</p> {{ repo.description }}
-                <div id="dtfn">
-                    Date Created:
+
+        <div class="row">
+            <div class="card bg-light mb-3" id="prof1" style="max-width: 18rem;" *ngFor='let repo of myRepos.newRepository'>
+                <div class="card-header" style="font-weight: bold;">Repo Name: {{ repo.name | titlecase }} </div>
+                <div class="card-body">
+                    <a type="button" class="btn btn-success btn-sm" href="{{repo.html_url}}" target="_blank" id="btl">Open in Github</a>
+                    <p class="card-text" id="des"> Description:</p> {{ repo.description }}
+                    <div id="dtfn">
+                        Date Created:
+                    </div>
+                    <p class="card-text" id="dat">{{ repo.created_at | date}} </p>
                 </div>
-                <p class="card-text" id="dat">{{ repo.created_at | date}} </p>
             </div>
-        </div>
 
+        </div>
     </div>
 </div>
