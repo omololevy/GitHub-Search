@@ -22,7 +22,7 @@ export class UsersComponent implements OnInit {
  this.userService.getUsers(username);
  this.myRepos.getRepos(username);
  this.users = this.userService.users;
-this.ngOnInit();
+ this.ngOnInit();
   }
 
 }
