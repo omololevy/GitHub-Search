@@ -19,10 +19,10 @@ export class UsersComponent implements OnInit {
   ngOnInit(): void { }
 
   doSearch(username: string){
- this.userService.getUsers(username);
- this.myRepos.getRepos(username);
- this.users = this.userService.users;
- this.ngOnInit();
+    this.userService.getUsers(username);
+    this.myRepos.getRepos(username);
+    this.users = this.userService.users;
+    this.ngOnInit();
   }
 
 }
