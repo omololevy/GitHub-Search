@@ -2,17 +2,11 @@
     <ng-progress></ng-progress>
     <div class="row">
         <div class="col-md-4">
-            <div class="card bg-light mb-3" id="nyc">
+            <div class="card bg-light mb-3" id="sch">
                 <form class="form-inline">
                     <div class="form-group">
-                        <p style="font-weight: bold;">Search By UserName: </p>
+                        <p style="font-weight: bold;">Search By Username: </p>
                         <input type="search" class="form-control" placeholder="Enter username to search" id="searching" #search>
-                    </div>
-                    <button type="button" class="btn btn-primary" (click)="doSearch(search.value)">Search</button>
-
-                    <div class="form-group">
-                        <p style="font-weight: bold;">Search By Repository name: </p>
-                        <input type="search" class="form-control" placeholder="Enter repository to search" id="searching" #search>
                     </div>
                     <button type="button" class="btn btn-primary" (click)="doSearch(search.value)">Search</button>
                 </form>
@@ -20,7 +14,7 @@
 
         </div>
         <div class="col-md-8">
-            <div class="card bg-light mb-3" id="myc">
+            <div class="card bg-light mb-3" id="prof">
                 <div class="row no-gutters">
                     <div class="col-md-3">
                         <img src={{users.avatar_url}} class="card-img" alt="...">
@@ -28,8 +22,8 @@
                     <div class="col">
                         <div class="card-header">Name: {{ users.name | titlecase }} {{ users. login | titlecase}} </div>
                         <div class="card-body">
-                            <p class="card-title">Repositories: {{ users.public_repos }} </p>
                             <p class="card-text"> Date Created: {{ users.created_at | date}} </p>
+                            <p class="card-title">Number of Repositories: {{ users.public_repos }} </p>
                             <button type="button" class="btn btn-outline-primary"> Followers: {{ users.followers }} Following: {{
                 users.following }} </button>
                         </div>
@@ -44,15 +38,15 @@
     </div>
 
     <div class="row">
-        <div class="card bg-light mb-3" id="myc" style="max-width: 18rem;" *ngFor='let repo of myRepos.newRepository'>
+        <div class="card bg-light mb-3" id="prof" style="max-width: 18rem;" *ngFor='let repo of myRepos.newRepository'>
             <div class="card-header" style="font-weight: bold;">Repo Name: {{ repo.name | titlecase }} </div>
             <div class="card-body">
                 <a type="button" class="btn btn-success btn-sm" href="{{repo.html_url}}" target="_blank" id="btl">Open in Github</a>
-                <p class="card-text" id="bb"> Description:</p> {{ repo.description }}
-                <div id="dada">
+                <p class="card-text" id="des"> Description:</p> {{ repo.description }}
+                <div id="dtfn">
                     Date Created:
                 </div>
-                <p class="card-text" id="dd">{{ repo.created_at | date}} </p>
+                <p class="card-text" id="dat">{{ repo.created_at | date}} </p>
             </div>
         </div>
 
