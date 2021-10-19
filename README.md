@@ -1,9 +1,23 @@
-# Github
+# GITHUB-SEARCH
+#### This is a project on developing an application where users can create quotes and have those quotes voted on whether they are terrible or are inspirational..
+ 
+ ***Tuesday October 19 2021*** 
+#### By **OMOLO LEVY**&trade;
+
+## Description
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.7.
 
 ## Development server
 
+## Project live site
+  This is the live [link](https://omololevy.github.io/GitHub-Search)
+
+  The app looks like this: 
+  ![Image](./src/assets/demo.png)
+
+
+## Set Up Instructions
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ## Code scaffolding
@@ -25,3 +39,17 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+## Technologies Used
+* HTML
+* CSS
+* Bootsrap
+* Javascript
+* Typescript
+* Angular
+
+## Support and contact details
+contact me @omololevy@gmail.com
+### License
+The project is under [MIT license](https://github.com/omololevy/Quote-Vote/commit/388e1788c5d156476a55a8c4e4421a8fb68c885d) 
+Copyright &copy; 2021.All rigths reserved
