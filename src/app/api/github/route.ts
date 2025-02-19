@@ -9,12 +9,24 @@ import {
 const GITHUB_API = "https://api.github.com";
 
 async function fetchWithAuth(url: string) {
-  return fetch(url, {
+  const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
       Accept: "application/vnd.github.v3+json",
     },
   });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "GitHub API request failed");
+  }
+
+  const remaining = response.headers.get("x-ratelimit-remaining");
+  if (remaining && parseInt(remaining) < 10) {
+    console.warn("GitHub API rate limit is running low:", remaining);
+  }
+
+  return response;
 }
 
 export async function GET(request: Request) {
@@ -29,6 +41,10 @@ export async function GET(request: Request) {
   }
 
   try {
+    if (!process.env.GITHUB_TOKEN) {
+      throw new Error("GitHub token is not configured");
+    }
+
     const userResponse = await fetchWithAuth(`${GITHUB_API}/users/${username}`);
     const userData: GitHubUserResponse = await userResponse.json();
 
@@ -54,8 +70,13 @@ export async function GET(request: Request) {
       contributions: contributionsData.total,
     });
   } catch (error) {
+    console.error("API Error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch user data" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to fetch user data",
+        details: process.env.NODE_ENV === "development" ? error : undefined,
+      },
       { status: 500 }
     );
   }

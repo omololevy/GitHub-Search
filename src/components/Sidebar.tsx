@@ -71,11 +71,11 @@ export default function Sidebar() {
           opacity: 1,
         }}
         className="fixed left-0 top-0 h-screen w-[280px] 
-          transform transition-transform duration-300 ease-in-out
-          lg:relative lg:translate-x-0 
           bg-card/50 backdrop-blur-xl 
           p-6 border-r border-border/50 
-          shadow-xl shadow-black/5 z-40"
+          shadow-xl shadow-black/5 z-40
+          transform transition-transform duration-300 ease-in-out
+          lg:transform-none lg:translate-x-0 lg:relative"
       >
         <div className="flex flex-col gap-2 pt-16 lg:pt-4">
           {/* Logo/Brand */}
