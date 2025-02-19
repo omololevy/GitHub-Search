@@ -6,6 +6,12 @@ import { useState } from "react";
 import { FiSearch, FiAward, FiMenu, FiX } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 
+type MenuItemProps = {
+  path: string;
+  label: string;
+  icon: React.ElementType;
+};
+
 export default function Sidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +21,7 @@ export default function Sidebar() {
     { path: "/ranks", label: "Rankings", icon: FiAward },
   ];
 
-  const MenuItem = ({ path, label, icon: Icon }) => {
+  const MenuItem = ({ path, label, icon: Icon }: MenuItemProps) => {
     const isActive = pathname === path;
     return (
       <Link
@@ -62,9 +68,14 @@ export default function Sidebar() {
         initial={false}
         animate={{
           x: isOpen ? 0 : -320,
-          opacity: isOpen ? 1 : 0.5,
+          opacity: 1,
         }}
-        className="lg:translate-x-0 lg:opacity-100 w-[280px] h-screen bg-card/50 backdrop-blur-xl fixed left-0 top-0 p-6 border-r border-border/50 shadow-xl shadow-black/5 z-40"
+        className="fixed left-0 top-0 h-screen w-[280px] 
+          transform transition-transform duration-300 ease-in-out
+          lg:relative lg:translate-x-0 
+          bg-card/50 backdrop-blur-xl 
+          p-6 border-r border-border/50 
+          shadow-xl shadow-black/5 z-40"
       >
         <div className="flex flex-col gap-2 pt-16 lg:pt-4">
           {/* Logo/Brand */}
