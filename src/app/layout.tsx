@@ -33,8 +33,8 @@ export default function RootLayout({
         <ThemeProvider attribute="class">
           <div className="flex min-h-screen bg-background text-foreground">
             <Sidebar />
-            <main className="ml-64 w-full p-8">
-              <div className="flex justify-end mb-4">
+            <main className="w-full lg:ml-64 p-4 lg:p-8">
+              <div className="flex justify-end mb-4 pt-12 lg:pt-0">
                 <ThemeToggle />
               </div>
               {children}
