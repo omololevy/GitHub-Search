@@ -35,16 +35,19 @@ export default function Home() {
   }, {} as Record<string, UserStats[]>);
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-4 lg:p-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-4xl mx-auto"
       >
-        <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <h1 className="text-2xl lg:text-4xl font-bold mb-6 lg:mb-8 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
           GitHub User Rankings
         </h1>
-        <UserSearch onSearch={searchUser} />
+
+        <div className="w-full lg:w-auto">
+          <UserSearch onSearch={searchUser} />
+        </div>
 
         {loading && <LoadingSpinner />}
 
@@ -57,7 +60,7 @@ export default function Home() {
               exit={{ opacity: 0, y: -20 }}
               className="mt-8"
             >
-              <h2 className="text-xl font-bold mb-4">{country}</h2>
+              <h2 className="text-lg lg:text-xl font-bold mb-4">{country}</h2>
               <div className="grid gap-4">
                 {users
                   .sort(
@@ -66,17 +69,17 @@ export default function Home() {
                   )
                   .map((user) => (
                     <div key={user.login} className="p-4 border rounded-lg">
-                      <div className="flex items-center gap-4">
+                      <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
                         <img
                           src={user.avatar_url}
                           alt={user.login}
                           className="w-12 h-12 rounded-full"
                         />
-                        <div>
+                        <div className="flex-1">
                           <h3 className="font-bold">
                             {user.name || user.login}
                           </h3>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-muted break-words">
                             Followers: {user.followers} | Stars:{" "}
                             {user.totalStars} | Repos: {user.public_repos} |
                             Contributions: {user.contributions}

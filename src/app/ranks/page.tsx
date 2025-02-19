@@ -53,13 +53,13 @@ export default function RanksPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4">
-      <div className="mb-8 bg-card rounded-xl p-6 shadow-soft-lg">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+      <div className="mb-8 bg-card rounded-xl p-4 lg:p-6 shadow-soft-lg">
+        <h1 className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
           GitHub Rankings
         </h1>
 
         {/* Filters */}
-        <div className="mt-4 flex flex-wrap gap-4">
+        <div className="mt-4 flex flex-col lg:flex-row gap-4">
           <select
             value={filters.type}
             onChange={(e) =>
@@ -128,7 +128,7 @@ export default function RanksPage() {
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                   className="bg-card p-6 rounded-xl shadow-soft hover:shadow-soft-lg transition-all duration-300"
                 >
-                  <div className="flex items-center gap-6">
+                  <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 lg:gap-6">
                     <div className="relative">
                       <motion.div
                         className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full opacity-75 blur"
@@ -154,7 +154,7 @@ export default function RanksPage() {
                       </h2>
                       <p className="text-muted">{user.location}</p>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-2 lg:gap-4 w-full lg:w-auto">
                       <StatCard
                         label="Followers"
                         value={user.followers}
@@ -184,7 +184,7 @@ export default function RanksPage() {
 
           {/* Pagination */}
           {data && (
-            <div className="mt-8 flex justify-center gap-2">
+            <div className="mt-8 flex flex-wrap justify-center gap-2">
               {Array.from({ length: data.totalPages }, (_, i) => (
                 <button
                   key={i}
