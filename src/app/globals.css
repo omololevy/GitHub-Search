@@ -2,15 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #FFFFFF;
+    --foreground: #1F2937;
+    --surface: #F3F4F6;
+    --primary: #4F46E5;
+    --secondary: #10B981;
+    --accent: #8B5CF6;
+    --muted: #9CA3AF;
+    --card: #FFFFFF;
+    --border: #E5E7EB;
+  }
+
+  .dark {
+    --background: #0F172A;
+    --foreground: #F1F5F9;
+    --surface: #1E293B;
+    --primary: #6366F1;
+    --secondary: #34D399;
+    --accent: #A78BFA;
+    --muted: #64748B;
+    --card: #1E293B;
+    --border: #2D3748;
   }
 }
 
