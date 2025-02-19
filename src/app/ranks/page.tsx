@@ -36,13 +36,17 @@ export default function RanksPage() {
       const data = await response.json();
       setData(data);
 
-      // Extract unique countries for the filter
+      // Extract unique countries with proper type checking
       if (filters.country === "global") {
-        const uniqueCountries = [
-          ...new Set(
-            data.items.map((user: UserStats) => user.location).filter(Boolean)
-          ),
-        ];
+        const uniqueCountries = Array.from(
+          new Set(
+            data.items
+              .map((user: UserStats) => user.location)
+              .filter((location: string | undefined | null): location is string =>
+                Boolean(location?.length)
+              )
+          )
+        );
         setCountries(uniqueCountries);
       }
     } catch (error) {
@@ -93,7 +97,14 @@ export default function RanksPage() {
 
           {/* Sort buttons */}
           <div className="flex gap-2">
-            {(["followers", "totalStars", "contributions", "public_repos"] as const).map((key) => (
+            {(
+              [
+                "followers",
+                "totalStars",
+                "contributions",
+                "public_repos",
+              ] as const
+            ).map((key) => (
               <button
                 key={key}
                 onClick={() =>
