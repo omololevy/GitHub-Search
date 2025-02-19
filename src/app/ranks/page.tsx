@@ -33,20 +33,18 @@ export default function RanksPage() {
 
     try {
       const response = await fetch(`/api/github/rankings?${params}`);
-      const data = await response.json();
-      setData(data);
+      const responseData = (await response.json()) as PaginatedResponse<UserStats>;
+      setData(responseData);
 
-      // Extract unique countries with proper type checking
+      // Fixed type checking for countries
       if (filters.country === "global") {
-        const uniqueCountries = Array.from(
-          new Set(
-            data.items
-              .map((user: UserStats) => user.location)
-              .filter((location: string | undefined | null): location is string =>
-                Boolean(location?.length)
-              )
-          )
-        );
+        const validLocations = responseData.items
+          .map(user => user.location)
+          .filter((location): location is string => 
+            typeof location === 'string' && location.length > 0
+          );
+          
+        const uniqueCountries = [...new Set(validLocations)].sort();
         setCountries(uniqueCountries);
       }
     } catch (error) {
