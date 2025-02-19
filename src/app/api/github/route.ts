@@ -1,4 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from "next/server";
+import {
+  GitHubUserResponse,
+  GitHubRepoResponse,
+  GitHubContributionsResponse,
+} from "@/types/github";
 
 const GITHUB_API = "https://api.github.com";
 
@@ -24,20 +30,21 @@ export async function GET(request: Request) {
 
   try {
     const userResponse = await fetchWithAuth(`${GITHUB_API}/users/${username}`);
-    const userData = await userResponse.json();
+    const userData: GitHubUserResponse = await userResponse.json();
 
     const reposResponse = await fetchWithAuth(
       `${GITHUB_API}/users/${username}/repos`
     );
-    const reposData = await reposResponse.json();
+    const reposData: GitHubRepoResponse[] = await reposResponse.json();
 
     const contributionsResponse = await fetchWithAuth(
       `${GITHUB_API}/users/${username}/contributions`
     );
-    const contributionsData = await contributionsResponse.json();
+    const contributionsData: GitHubContributionsResponse =
+      await contributionsResponse.json();
 
     const totalStars = reposData.reduce(
-      (acc: number, repo: any) => acc + repo.stargazers_count,
+      (acc: number, repo: GitHubRepoResponse) => acc + repo.stargazers_count,
       0
     );
 
