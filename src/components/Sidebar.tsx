@@ -68,7 +68,7 @@ export default function Sidebar() {
         initial={false}
         animate={{
           x: isOpen ? 0 : -320,
-          opacity: 1,
+          opacity: isOpen ? 1 : 0,
         }}
         className="fixed left-0 top-0 h-screen w-[280px] 
           bg-card/50 backdrop-blur-xl 
