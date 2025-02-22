@@ -74,8 +74,9 @@ export default function Sidebar() {
           bg-card/50 backdrop-blur-xl 
           p-6 border-r border-border/50 
           shadow-xl shadow-black/5 z-40
+          lg:opacity-100 lg:visible
           transform transition-transform duration-300 ease-in-out
-          lg:transform-none lg:translate-x-0 lg:relative"
+          lg:relative lg:translate-x-0 lg:transform-none"
       >
         <div className="flex flex-col gap-2 pt-16 lg:pt-4">
           {/* Logo/Brand */}

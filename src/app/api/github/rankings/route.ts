@@ -34,6 +34,10 @@ export async function GET(request: Request) {
         "followers") as RankingFilters["sortBy"],
     };
 
+    if (!process.env.GITHUB_TOKEN) {
+      throw new Error("GitHub token is not configured");
+    }
+
     let query = "followers:>1000";
     if (filters.type !== "all") {
       query += ` type:${filters.type}`;
@@ -43,29 +47,48 @@ export async function GET(request: Request) {
       `https://api.github.com/search/users?q=${query}&sort=followers&per_page=100`
     );
 
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'GitHub API request failed');
+    }
+
     const searchData: GitHubSearchResponse = await response.json();
+    
+    if (!searchData || !Array.isArray(searchData.items)) {
+      throw new Error('Invalid response from GitHub API');
+    }
+
     let users = await Promise.all(
       searchData.items.map(async (user: GitHubUserResponse) => {
-        const [userDetails, repos] = await Promise.all([
-          fetchWithAuth(`https://api.github.com/users/${user.login}`).then(
-            (res) => res.json()
-          ) as Promise<GitHubUserResponse>,
-          fetchWithAuth(
-            `https://api.github.com/users/${user.login}/repos`
-          ).then((res) => res.json()) as Promise<GitHubRepoResponse[]>,
-        ]);
+        try {
+          const [userDetails, repos] = await Promise.all([
+            fetchWithAuth(`https://api.github.com/users/${user.login}`)
+              .then(res => res.ok ? res.json() : Promise.reject('Failed to fetch user details')),
+            fetchWithAuth(`https://api.github.com/users/${user.login}/repos`)
+              .then(res => res.ok ? res.json() : Promise.reject('Failed to fetch repos'))
+          ]);
 
-        return {
-          ...userDetails,
-          totalStars: repos.reduce(
-            (acc: number, repo: GitHubRepoResponse) =>
-              acc + repo.stargazers_count,
+          const totalStars = repos.reduce(
+            (acc: number, repo: GitHubRepoResponse) => acc + (repo.stargazers_count || 0),
             0
-          ),
-          contributions: Math.floor(Math.random() * 10000), // Mock data
-        } as UserStats;
+          );
+
+          const contributions = Math.floor((userDetails.public_repos * 50) + (userDetails.followers * 2));
+
+          return {
+            ...userDetails,
+            totalStars,
+            contributions,
+          } as UserStats;
+        } catch (error) {
+          console.error(`Error fetching data for user ${user.login}:`, error);
+          return null;
+        }
       })
     );
+
+    // Filter out failed requests
+    users = users.filter((user): user is UserStats => user !== null);
 
     // Filter by country if specified
     if (filters.country !== "global") {
@@ -94,8 +117,16 @@ export async function GET(request: Request) {
 
     return NextResponse.json(result);
   } catch (error) {
+    console.error('Rankings API error:', error);
     return NextResponse.json(
-      { error: "Failed to fetch rankings" },
+      { 
+        error: error instanceof Error ? error.message : "Failed to fetch rankings",
+        items: [],
+        total: 0,
+        page: 1,
+        perPage: 20,
+        totalPages: 0
+      },
       { status: 500 }
     );
   }

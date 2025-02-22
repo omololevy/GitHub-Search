@@ -9,20 +9,58 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function Home() {
   const [users, setUsers] = useState<UserStats[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const searchUser = async (username: string) => {
+    if (!username.trim()) return;
+    
     setLoading(true);
+    setError(null);
+    
     try {
+      // First, search for the user using GitHub's search API
+      const searchResponse = await fetch(
+        `https://api.github.com/search/users?q=${username}+in:login`,
+        {
+          headers: {
+            Accept: "application/vnd.github.v3+json",
+          },
+        }
+      );
+
+      if (!searchResponse.ok) {
+        throw new Error('Failed to search GitHub users');
+      }
+
+      const searchData = await searchResponse.json();
+      
+      if (searchData.total_count === 0) {
+        setError(`No user found with username: ${username}`);
+        setLoading(false);
+        return;
+      }
+
+      // Then fetch detailed user data through our API
       const response = await fetch(`/api/github?username=${username}`);
       const userData = await response.json();
 
-      if (response.ok) {
-        setUsers((prev) => [...prev, userData]);
+      if (!response.ok) {
+        throw new Error(userData.error || 'Failed to fetch user details');
       }
+
+      setUsers(prevUsers => {
+        // Avoid duplicates
+        const exists = prevUsers.some(user => user.login === userData.login);
+        if (exists) return prevUsers;
+        return [...prevUsers, userData];
+      });
+      
     } catch (error) {
       console.error("Error fetching user:", error);
+      setError(error instanceof Error ? error.message : 'Failed to fetch user data');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const groupedUsers = users.reduce((acc, user) => {
@@ -47,6 +85,11 @@ export default function Home() {
 
         <div className="w-full lg:w-auto">
           <UserSearch onSearch={searchUser} />
+          {error && (
+            <p className="mt-4 text-red-500 text-sm">
+              {error}
+            </p>
+          )}
         </div>
 
         {loading && <LoadingSpinner />}

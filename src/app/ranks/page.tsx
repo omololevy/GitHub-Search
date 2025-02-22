@@ -15,6 +15,7 @@ export default function RanksPage() {
   });
   const [data, setData] = useState<PaginatedResponse<UserStats> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [countries, setCountries] = useState<string[]>([]);
 
   useEffect(() => {
@@ -23,20 +24,31 @@ export default function RanksPage() {
 
   const fetchRankings = async () => {
     setLoading(true);
-    const params = new URLSearchParams({
-      type: filters.type,
-      country: filters.country,
-      page: filters.page.toString(),
-      perPage: filters.perPage.toString(),
-      sortBy: filters.sortBy,
-    });
-
+    setError(null);
+    
     try {
+      const params = new URLSearchParams({
+        type: filters.type,
+        country: filters.country,
+        page: filters.page.toString(),
+        perPage: filters.perPage.toString(),
+        sortBy: filters.sortBy,
+      });
+
       const response = await fetch(`/api/github/rankings?${params}`);
-      const responseData = (await response.json()) as PaginatedResponse<UserStats>;
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(responseData.error || 'Failed to fetch rankings');
+      }
+
+      if (!responseData.items) {
+        throw new Error('Invalid response format from API');
+      }
+
       setData(responseData);
 
-      // Fixed type checking for countries
+      // Update countries list
       if (filters.country === "global") {
         const validLocations = responseData.items
           .map(user => user.location)
@@ -49,8 +61,10 @@ export default function RanksPage() {
       }
     } catch (error) {
       console.error("Error fetching rankings:", error);
+      setError(error instanceof Error ? error.message : 'Failed to fetch rankings');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -120,6 +134,12 @@ export default function RanksPage() {
           </div>
         </div>
       </div>
+
+      {error && (
+        <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-lg">
+          {error}
+        </div>
+      )}
 
       {/* Results */}
       {loading ? (

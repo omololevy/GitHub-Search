@@ -29,9 +29,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        suppressHydrationWarning
       >
-        <ThemeProvider enableSystem attribute="class">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <div className="flex min-h-screen bg-background text-foreground">
             <Sidebar />
             <div className="flex-1">
