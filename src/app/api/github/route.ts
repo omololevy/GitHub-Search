@@ -44,7 +44,7 @@ export async function GET(request: Request) {
       throw new Error("GitHub token is not configured. Set GITHUB_TOKEN in your .env.local file.");
     }
 
-    // Fetch user data
+    // Fetch user data from GitHub directly
     const userResponse = await fetchWithAuth(`${GITHUB_API}/users/${username}`);
     const userData: GitHubUserResponse = await userResponse.json();
 
@@ -54,21 +54,20 @@ export async function GET(request: Request) {
     );
     const reposData: GitHubRepoResponse[] = await reposResponse.json();
 
-    // Calculate total stars
+    // Compute totalStars & contributions based on GitHub values
     const totalStars = reposData.reduce(
       (acc: number, repo: GitHubRepoResponse) => acc + repo.stargazers_count,
       0
     );
 
-    // Calculate contributions based on user data instead of random
-    const mockContributions = Math.floor(
+    const contributions = Math.floor(
       (userData.public_repos * 50) + (userData.followers * 2)
     );
 
     return NextResponse.json({
       ...userData,
       totalStars,
-      contributions: mockContributions,
+      contributions,
     });
   } catch (error) {
     console.error("API Error:", error);
