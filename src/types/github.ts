@@ -11,9 +11,17 @@ export interface GitHubRepo {
   stargazers_count: number;
 }
 
-export interface UserStats extends GitHubUser {
+export interface UserStats {
+  login: string;
+  name: string | null;
+  location: string | null;
+  public_repos: number;
+  followers: number;
+  avatar_url: string;
   totalStars: number;
   contributions: number;
+  country: string | null;
+  detectedCountry?: string | null;
 }
 
 export interface PaginatedResponse<T> {
