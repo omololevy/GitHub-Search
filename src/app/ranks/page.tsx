@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,6 +6,7 @@ import { UserStats, RankingFilters, PaginatedResponse } from "@/types/github";
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { countries, regions } from "@/utils/countries";
+import Image from "next/image";
 
 export default function RanksPage() {
   const [filters, setFilters] = useState<RankingFilters>({
@@ -17,7 +19,6 @@ export default function RanksPage() {
   const [data, setData] = useState<PaginatedResponse<UserStats> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [detectedLocations, setDetectedLocations] = useState<string[]>([]); // Renamed from countries
 
   useEffect(() => {
     const initializeRankings = async () => {
@@ -66,19 +67,6 @@ export default function RanksPage() {
       }
 
       setData(responseData);
-
-      // Update countries list
-      if (filters.country === "global") {
-        const validLocations = responseData.items
-          .map((user) => user.location)
-          .filter(
-            (location): location is string =>
-              typeof location === "string" && location.length > 0
-          );
-
-        const uniqueCountries = [...new Set(validLocations)].sort();
-        setDetectedLocations(uniqueCountries);
-      }
     } catch (error) {
       console.error("Error fetching rankings:", error);
       setError(
@@ -202,10 +190,13 @@ export default function RanksPage() {
                           repeatType: "reverse",
                         }}
                       />
-                      <img
+                      <Image
                         src={user.avatar_url}
                         alt={user.login}
-                        className="w-16 h-16 rounded-full relative"
+                        width={64}
+                        height={64}
+                        className="relative rounded-full"
+                        unoptimized
                       />
                     </div>
                     <div className="flex-1">

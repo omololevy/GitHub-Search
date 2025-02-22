@@ -5,6 +5,7 @@ import UserSearch from "@/components/UserSearch";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { UserStats } from "@/types/github";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 export default function Home() {
   const [users, setUsers] = useState<UserStats[]>([]);
@@ -113,10 +114,13 @@ export default function Home() {
                   .map((user) => (
                     <div key={user.login} className="p-4 border rounded-lg">
                       <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
-                        <img
+                        <Image
                           src={user.avatar_url}
                           alt={user.login}
-                          className="w-12 h-12 rounded-full"
+                          width={64}
+                          height={64}
+                          className="relative rounded-full"
+                          unoptimized
                         />
                         <div className="flex-1">
                           <h3 className="font-bold">
