@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { UserStats, RankingFilters, PaginatedResponse } from "@/types/github";
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { countries } from "@/utils/countries";
 
 export default function RanksPage() {
   const [filters, setFilters] = useState<RankingFilters>({
@@ -100,35 +101,36 @@ export default function RanksPage() {
             className="px-4 py-2 rounded-lg bg-surface"
           >
             <option value="global">Global</option>
-            {countries.map((country) => (
-              <option key={country} value={country}>
-                {country}
-              </option>
-            ))}
+            <optgroup label="Countries">
+              {countries.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </optgroup>
           </select>
 
           {/* Sort buttons */}
-          <div className="flex gap-2">
-            {(
-              [
-                "followers",
-                "totalStars",
-                "contributions",
-                "public_repos",
-              ] as const
-            ).map((key) => (
+          <div className="flex flex-wrap gap-2">
+            {[
+              { key: "followers", label: "Followers" },
+              { key: "totalStars", label: "Total Stars" },
+              { key: "contributions", label: "Contributions" },
+              { key: "public_repos", label: "Repositories" }
+            ].map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() =>
-                  setFilters((f) => ({ ...f, sortBy: key, page: 1 }))
+                  setFilters((f) => ({ ...f, sortBy: key as RankingFilters["sortBy"], page: 1 }))
                 }
                 className={`px-4 py-2 rounded-lg transition-all duration-300 ${
                   filters.sortBy === key
                     ? "bg-primary text-white shadow-lg scale-105"
                     : "bg-surface hover:bg-opacity-80"
                 }`}
+                title={`Sort by ${label}`}
               >
-                {key.charAt(0).toUpperCase() + key.slice(1)}
+                {label}
               </button>
             ))}
           </div>
