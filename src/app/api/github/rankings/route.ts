@@ -83,12 +83,18 @@ export async function GET(request: Request) {
       where: whereClause,
     });
 
-    // Enhance user data with better country detection
-    const enhancedUsers = users.map((user) => ({
-      ...user,
-      detectedCountry: user.location
-        ? findCountryByLocation(user.location)?.name
-        : null,
+    // Convert prisma users to UserStats type
+    const enhancedUsers: UserStats[] = users.map((user) => ({
+      login: user.login,
+      name: user.name,
+      location: user.location,
+      public_repos: user.public_repos,
+      followers: user.followers,
+      avatar_url: user.avatar_url,
+      totalStars: user.totalStars,
+      contributions: user.contributions,
+      country: user.country,
+      detectedCountry: user.location ? findCountryByLocation(user.location)?.name : null
     }));
 
     const result: PaginatedResponse<UserStats> = {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
@@ -33,7 +34,7 @@ export async function GET(request: Request) {
         fetchWithAuth(`${GITHUB_API}/users/${user.login}/repos?per_page=100`).then(res => res.json()),
       ]);
 
-      const totalStars = repos.reduce((acc, repo) => acc + (repo.stargazers_count || 0), 0);
+      const totalStars = repos.reduce((acc: any, repo: { stargazers_count: any; }) => acc + (repo.stargazers_count || 0), 0);
       const contributions = Math.floor((userDetails.public_repos * 50) + (userDetails.followers * 2));
 
       // Update or create user in database

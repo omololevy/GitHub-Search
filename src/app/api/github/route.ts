@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from "next/server";
 import {
   GitHubUserResponse,
@@ -56,7 +55,7 @@ export async function GET(request: Request) {
 
     // Compute totalStars & contributions based on GitHub values
     const totalStars = reposData.reduce(
-      (acc: number, repo: GitHubRepoResponse) => acc + repo.stargazers_count,
+      (acc: number, repo: GitHubRepoResponse) => acc + (repo.stargazers_count || 0),
       0
     );
 
