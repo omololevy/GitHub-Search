@@ -1,5 +1,6 @@
 import prisma from '../src/lib/prisma';
 import { findCountryByLocation } from '../src/utils/countries';
+import { GitHubUserResponse, GitHubRepoResponse } from '../src/types/github';
 
 const GITHUB_API = "https://api.github.com";
 const BATCH_SIZE = 10;
@@ -41,14 +42,21 @@ async function populateDatabase() {
       const batch = data.items.slice(i, i + BATCH_SIZE);
       console.log(`Processing batch ${i/BATCH_SIZE + 1}...`);
 
-      await Promise.all(batch.map(async (user: any) => {
+      await Promise.all(batch.map(async (user: GitHubUserResponse) => {
         try {
           const [userDetails, repos] = await Promise.all([
-            fetchWithAuth(`${GITHUB_API}/users/${user.login}`).then(res => res.json()),
-            fetchWithAuth(`${GITHUB_API}/users/${user.login}/repos?per_page=100`).then(res => res.json()),
+            fetchWithAuth(`${GITHUB_API}/users/${user.login}`)
+              .then((res) => res.json()) as Promise<GitHubUserResponse>,
+            fetchWithAuth(`${GITHUB_API}/users/${user.login}/repos?per_page=100`)
+              .then((res) => res.json()) as Promise<GitHubRepoResponse[]>,
           ]);
 
-          const totalStars = repos.reduce((acc: number, repo: any) => acc + (repo.stargazers_count || 0), 0);
+          const totalStars = repos.reduce(
+            (acc: number, repo: GitHubRepoResponse) => 
+              acc + (repo.stargazers_count || 0),
+            0
+          );
+
           const contributions = Math.floor((userDetails.public_repos * 50) + (userDetails.followers * 2));
           const country = userDetails.location ? findCountryByLocation(userDetails.location)?.name : null;
 
