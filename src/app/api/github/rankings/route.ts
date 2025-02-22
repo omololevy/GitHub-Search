@@ -1,15 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from "next/server";
-import {
-  UserStats,
-  PaginatedResponse,
-  RankingFilters,
-  GitHubUserResponse,
-  GitHubRepoResponse,
-} from "@/types/github";
+import prisma from "@/lib/prisma";
+import { UserStats, PaginatedResponse, RankingFilters } from "@/types/github";
+import { findCountryByLocation, countries } from "@/utils/countries";
 
 // Add these utility functions at the top
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
   for (let i = 0; i < retries; i++) {
@@ -22,12 +18,14 @@ async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
       });
 
       if (response.status === 403) {
-        const resetTime = response.headers.get('x-ratelimit-reset');
-        const rateLimitRemaining = response.headers.get('x-ratelimit-remaining');
+        const resetTime = response.headers.get("x-ratelimit-reset");
+        const rateLimitRemaining = response.headers.get(
+          "x-ratelimit-remaining"
+        );
         console.warn(`Rate limit remaining: ${rateLimitRemaining}`);
-        
+
         if (resetTime) {
-          const waitTime = (parseInt(resetTime) * 1000) - Date.now();
+          const waitTime = parseInt(resetTime) * 1000 - Date.now();
           if (waitTime > 0 && i < retries - 1) {
             await delay(Math.min(waitTime + 1000, 5000));
             continue;
@@ -38,7 +36,7 @@ async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       // Add a small delay between successful requests
       await delay(1000);
       return response;
@@ -47,7 +45,7 @@ async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
       await delay(1000 * (i + 1)); // Exponential backoff
     }
   }
-  throw new Error('Max retries reached');
+  throw new Error("Max retries reached");
 }
 
 export async function GET(request: Request) {
@@ -62,112 +60,57 @@ export async function GET(request: Request) {
         "followers") as RankingFilters["sortBy"],
     };
 
-    // Modify the query to include location if country is specified
-    let query = "followers:>100";
-    if (filters.type !== "all") {
-      query += ` type:${filters.type}`;
-    }
+    let whereClause = {};
+
     if (filters.country !== "global") {
-      // Add location to the search query
-      query += ` location:"${filters.country}"`;
+      const selectedCountry = countries.find((c) => c.code === filters.country);
+      if (selectedCountry) {
+        whereClause = {
+          country: selectedCountry.name,
+        };
+      }
     }
 
-    const searchResponse = await fetchWithRetry(
-      `https://api.github.com/search/users?q=${encodeURIComponent(query)}&sort=followers&per_page=30`
-    );
+    // Query the database with improved country filtering
+    const users = await prisma.user.findMany({
+      where: whereClause,
+      orderBy: { [filters.sortBy]: "desc" },
+      skip: (filters.page - 1) * filters.perPage,
+      take: filters.perPage,
+    });
 
-    const searchData: GitHubSearchResponse = await searchResponse.json();
-    
-    // Process users in smaller batches
-    const batchSize = 5;
-    const processedUsers: UserStats[] = [];
+    const total = await prisma.user.count({
+      where: whereClause,
+    });
 
-    for (let i = 0; i < searchData.items.length; i += batchSize) {
-      const batch = searchData.items.slice(i, i + batchSize);
-      const batchResults = await Promise.allSettled(
-        batch.map(async (user: GitHubUserResponse) => {
-          try {
-            const [userDetails, repos] = await Promise.all([
-              fetchWithRetry(`https://api.github.com/users/${user.login}`)
-                .then(res => res.json()),
-              fetchWithRetry(`https://api.github.com/users/${user.login}/repos?per_page=100`)
-                .then(res => res.json())
-            ]);
-
-            const totalStars = repos.reduce(
-              (acc: number, repo: GitHubRepoResponse) => 
-                acc + (repo.stargazers_count || 0),
-              0
-            );
-
-            const contributions = Math.floor(
-              (userDetails.public_repos * 50) + (userDetails.followers * 2)
-            );
-
-            return {
-              ...userDetails,
-              totalStars,
-              contributions,
-            } as UserStats;
-          } catch (error) {
-            console.error(`Error processing user ${user.login}:`, error);
-            return null;
-          }
-        })
-      );
-
-      // Filter out failed requests and add successful ones to the result
-      batchResults.forEach(result => {
-        if (result.status === 'fulfilled' && result.value) {
-          processedUsers.push(result.value);
-        }
-      });
-
-      // Add a delay between batches
-      await delay(2000);
-    }
-
-    // Continue with existing filtering and pagination logic
-    let users = processedUsers;
-
-    // Improve country filtering
-    if (filters.country !== "global") {
-      users = users.filter((user) => {
-        const userLocation = user.location?.toLowerCase() || "";
-        const searchCountry = filters.country.toLowerCase();
-        return userLocation.includes(searchCountry);
-      });
-    }
-
-    // Sort users
-    users.sort((a, b) => b[filters.sortBy] - a[filters.sortBy]);
-
-    // Paginate results
-    const startIndex = (filters.page - 1) * filters.perPage;
-    const paginatedUsers = users.slice(
-      startIndex,
-      startIndex + filters.perPage
-    );
+    // Enhance user data with better country detection
+    const enhancedUsers = users.map((user) => ({
+      ...user,
+      detectedCountry: user.location
+        ? findCountryByLocation(user.location)?.name
+        : null,
+    }));
 
     const result: PaginatedResponse<UserStats> = {
-      items: paginatedUsers,
-      total: users.length,
+      items: enhancedUsers,
+      total,
       page: filters.page,
       perPage: filters.perPage,
-      totalPages: Math.ceil(users.length / filters.perPage),
+      totalPages: Math.ceil(total / filters.perPage),
     };
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Rankings API error:', error);
+    console.error("Rankings API error:", error);
     return NextResponse.json(
-      { 
-        error: error instanceof Error ? error.message : "Failed to fetch rankings",
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to fetch rankings",
         items: [],
         total: 0,
         page: 1,
         perPage: 20,
-        totalPages: 0
+        totalPages: 0,
       },
       { status: 500 }
     );
