@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { UserStats, RankingFilters, PaginatedResponse } from "@/types/github";
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { countries } from "@/utils/countries";
+import { countries, regions } from "@/utils/countries";
 
 export default function RanksPage() {
   const [filters, setFilters] = useState<RankingFilters>({
@@ -17,7 +17,25 @@ export default function RanksPage() {
   const [data, setData] = useState<PaginatedResponse<UserStats> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [countries, setCountries] = useState<string[]>([]);
+  const [detectedLocations, setDetectedLocations] = useState<string[]>([]); // Renamed from countries
+
+  useEffect(() => {
+    const initializeRankings = async () => {
+      // Check if we have data in the database
+      const response = await fetch("/api/github/rankings?page=1&perPage=1");
+      const data = await response.json();
+
+      if (data.total === 0) {
+        setError(
+          "No ranking data available. Please populate the database first."
+        );
+      } else {
+        fetchRankings();
+      }
+    };
+
+    initializeRankings();
+  }, []);
 
   useEffect(() => {
     fetchRankings();
@@ -26,7 +44,7 @@ export default function RanksPage() {
   const fetchRankings = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const params = new URLSearchParams({
         type: filters.type,
@@ -40,11 +58,11 @@ export default function RanksPage() {
       const responseData = await response.json();
 
       if (!response.ok) {
-        throw new Error(responseData.error || 'Failed to fetch rankings');
+        throw new Error(responseData.error || "Failed to fetch rankings");
       }
 
       if (!responseData.items) {
-        throw new Error('Invalid response format from API');
+        throw new Error("Invalid response format from API");
       }
 
       setData(responseData);
@@ -52,17 +70,20 @@ export default function RanksPage() {
       // Update countries list
       if (filters.country === "global") {
         const validLocations = responseData.items
-          .map(user => user.location)
-          .filter((location): location is string => 
-            typeof location === 'string' && location.length > 0
+          .map((user) => user.location)
+          .filter(
+            (location): location is string =>
+              typeof location === "string" && location.length > 0
           );
-          
+
         const uniqueCountries = [...new Set(validLocations)].sort();
-        setCountries(uniqueCountries);
+        setDetectedLocations(uniqueCountries);
       }
     } catch (error) {
       console.error("Error fetching rankings:", error);
-      setError(error instanceof Error ? error.message : 'Failed to fetch rankings');
+      setError(
+        error instanceof Error ? error.message : "Failed to fetch rankings"
+      );
     } finally {
       setLoading(false);
     }
@@ -101,13 +122,17 @@ export default function RanksPage() {
             className="px-4 py-2 rounded-lg bg-surface"
           >
             <option value="global">Global</option>
-            <optgroup label="Countries">
-              {countries.map((country) => (
-                <option key={country} value={country}>
-                  {country}
-                </option>
-              ))}
-            </optgroup>
+            {regions.map((region) => (
+              <optgroup key={region} label={region}>
+                {countries
+                  .filter((country) => country.region === region)
+                  .map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.name}
+                    </option>
+                  ))}
+              </optgroup>
+            ))}
           </select>
 
           {/* Sort buttons */}
@@ -116,12 +141,16 @@ export default function RanksPage() {
               { key: "followers", label: "Followers" },
               { key: "totalStars", label: "Total Stars" },
               { key: "contributions", label: "Contributions" },
-              { key: "public_repos", label: "Repositories" }
+              { key: "public_repos", label: "Repositories" },
             ].map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() =>
-                  setFilters((f) => ({ ...f, sortBy: key as RankingFilters["sortBy"], page: 1 }))
+                  setFilters((f) => ({
+                    ...f,
+                    sortBy: key as RankingFilters["sortBy"],
+                    page: 1,
+                  }))
                 }
                 className={`px-4 py-2 rounded-lg transition-all duration-300 ${
                   filters.sortBy === key
